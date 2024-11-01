@@ -36,6 +36,9 @@ struct CliArgs {
 
     #[options(help = "game path to use for both game executable and samp.dll")]
     gamepath: Option<String>,
+
+    #[options(no_short, help = "password used to connect to the server")]
+    gamepath: Option<String>,
 }
 
 static URI_SCHEME_VALUE: Mutex<String> = Mutex::new(String::new());
@@ -81,6 +84,7 @@ Options:
   -p, --port <PORT>          Server port
   -n, --name <NAME>          Nickname
   -g, --gamepath <GAMEPATH>  Game path
+      --password <PASSWORD>  Password
                 ",
                     raw_args[0]
                 );
@@ -89,21 +93,39 @@ Options:
 
             if args.host.is_some() && args.name.is_some() && args.port.is_some() {
                 if args.gamepath.is_some() && args.gamepath.as_ref().unwrap().len() > 0 {
-                    let _ = run_samp(
-                        args.name.unwrap().as_str(),
-                        args.host.unwrap().as_str(),
-                        args.port.unwrap(),
-                        args.gamepath.as_ref().unwrap().as_str(),
-                        format!("{}/samp.dll", args.gamepath.as_ref().unwrap()).as_str(),
-                        format!(
+                    if args.password.is_some() {
+                        let _ = run_samp(
+                            args.name.unwrap().as_str(),
+                            args.host.unwrap().as_str(),
+                            args.port.unwrap(),
+                            args.gamepath.as_ref().unwrap().as_str(),
+                            format!("{}/samp.dll", args.gamepath.as_ref().unwrap()).as_str(),
+                            format!(
                             "{}/com.open.mp/omp/omp-client.dll",
                             dirs_next::data_local_dir().unwrap().to_str().unwrap()
+                            )
+                            .as_str(),
+                            args.password.unwrap(),
                         )
-                        .as_str(),
-                        "",
-                    )
                     .await;
                     exit(0)
+                    } else {
+                        let _ = run_samp(
+                            args.name.unwrap().as_str(),
+                            args.host.unwrap().as_str(),
+                            args.port.unwrap(),
+                            args.gamepath.as_ref().unwrap().as_str(),
+                            format!("{}/samp.dll", args.gamepath.as_ref().unwrap()).as_str(),
+                            format!(
+                                "{}/com.open.mp/omp/omp-client.dll",
+                                dirs_next::data_local_dir().unwrap().to_str().unwrap()
+                            )
+                            .as_str(),
+                            "",
+                        )
+                    .await;
+                    exit(0)
+                    }
                 } else {
                     println!("You must provide game path using --game or -g. Read more about arguments in --help");
                     exit(0)
