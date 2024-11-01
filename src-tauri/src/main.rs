@@ -38,7 +38,7 @@ struct CliArgs {
     gamepath: Option<String>,
 
     #[options(no_short, help = "password used to connect to the server")]
-    gamepath: Option<String>,
+    password: Option<String>,
 }
 
 static URI_SCHEME_VALUE: Mutex<String> = Mutex::new(String::new());
